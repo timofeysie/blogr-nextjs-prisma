@@ -9,7 +9,7 @@ const Header: React.FC = () => {
 
   let left = (
     <div className="left">
-      <Link href="/">
+      <Link legacyBehavior href="/">
         <a className="bold" data-active={isActive("/")}>
           Feed
         </a>
