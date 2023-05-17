@@ -210,3 +210,51 @@ pages/api/auth/[...nextauth].ts
 Create a new directory and API route.
 
 Add boilerplate to configure NextAuth.js setup with GitHub OAuth credentials and the Prisma adapter.
+
+## Step 8. Add new post functionality
+
+touch pages/create.tsx
+
+The backend handles the POST submitted with Next.js API routes in the pages/api directory.
+
+touch pages/api/post/index.ts
+
+Create a new API route to create a post.
+
+### Invalid `prisma.post.findMany()` invocation
+
+npx prisma studio
+
+```txt
+Message: Error in Prisma Client request: 
+Invalid `prisma.post.findMany()` invocation:
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(Error { kind: Db, cause: Some(DbError { severity: "ERROR", parsed_severity: Some(Error), code: SqlState(E26000), message: "prepared statement \"s6\" does not exist", detail: None, hint: None, position: None, where_: None, schema: None, table: None, column: None, datatype: None, constraint: None, file: Some("prepare.c"), line: Some(451), routine: Some("FetchPreparedStatement") }) }), transient: false })
+  
+Query:
+{
+  "modelName": "Post",
+  "operation": "findMany",
+  "args": {
+    "take": 100,
+    "skip": 0,
+    "select": {
+      "id": true,
+      "title": true,
+      "content": true,
+      "published": true,
+      "author": true,
+      "authorId": true
+    }
+  }
+}
+```
+
+That findMany call has been there and working since step 5.
+
+This fixed it.
+
+```txt
+npx prisma generate
+npx prisma db push
+```
