@@ -213,17 +213,33 @@ Add boilerplate to configure NextAuth.js setup with GitHub OAuth credentials and
 
 ## Step 8. Add new post functionality
 
-touch pages/create.tsx
+Create pages/create.tsx
 
 The backend handles the POST submitted with Next.js API routes in the pages/api directory.
 
-touch pages/api/post/index.ts
+Create pages/api/post/index.ts
 
-Create a new API route to create a post.
+Create a new API route to create a post in that file.
+
+```js
+export default async function handle(req, res) {
+  const { title, content } = req.body;
+
+  const session = await getSession({ req });
+  const result = await prisma.post.create({
+    data: {
+      title: title,
+      content: content,
+      author: { connect: { email: session?.user?.email } },
+    },
+  });
+  res.json(result);
+}
+```
 
 ### Invalid `prisma.post.findMany()` invocation
 
-npx prisma studio
+Running the Prisma Studio with this command ```npx prisma studio``` causes this error:
 
 ```txt
 Message: Error in Prisma Client request: 
@@ -258,3 +274,61 @@ This fixed it.
 npx prisma generate
 npx prisma db push
 ```
+
+## Step 9. Add drafts functionality
+
+Create pages/drafts.tsx
+
+## Step 10. Add Publish functionality
+
+Implemented in the post detail view that currently lives in pages/p/[id].tsx.
+
+an HTTP PUT will be sent to a api/publish route in the "Next.js backend".
+
+Create a new directory inside the pages/api directory called publish. Then create a new file called [id].ts in the new directory:
+
+mkdir -p pages/api/publish && touch pages/api/publish/[id].ts
+
+## Step 11. Add Delete functionality
+
+Implement the API route handler function on the backend, and then adjust the frontend to use the route.
+
+Create pages/api/post/[id].ts
+
+This handles HTTP DELETE requests that are coming in via the /api/post/:id URL.
+
+// pages/p/[id].tsx
+
+```js
+async function deletePost(id: string): Promise<void> {
+  await fetch(`/api/post/${id}`, {
+    method: 'DELETE',
+  });
+  Router.push('/');
+}
+```
+
+### Errors
+
+When creating a new post, here are the following errors:
+
+Request URL:
+http://localhost:3000/api/post
+Request Method:
+POST
+Status Code:
+500 Internal Server Error
+
+Request URL:
+http://localhost:3000/_next/data/development/drafts.json
+Request Method:
+GET
+Status Code:
+403 Forbidden
+
+Request URL:
+http://localhost:3000/drafts
+Request Method:
+GET
+Status Code:
+403 Forbidden
